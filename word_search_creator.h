@@ -7,6 +7,7 @@
 #include "util.h"
 #include <unistd.h>
 
+
 char ** allocate_matrix_memory(int * N, int * M);
 
 char ** initialize_matrix(char ** matrix, int * N, int * M);

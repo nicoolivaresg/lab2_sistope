@@ -12,7 +12,7 @@ int main(int  argc, char ** argv){
 	int sflag = 0;//Flag nombre de archivo de salida
 	int dflag = 0;//Flag mostrar resultados por pantalla
 	char * input_file = NULL;
-	int thread_number = 0;
+	int threads_number = 0;
 	int matrix_row = 0;
 	int matrix_col = 0;
 	int words_number = 0;
@@ -33,7 +33,7 @@ int main(int  argc, char ** argv){
 				break;
 			case 'h':
 				hflag = 1;
-				sscanf(optarg, "%d", &thread_number);
+				sscanf(optarg, "%d", &threads_number);
 				break;
 			case 'c':
 				cflag = 1;
@@ -69,30 +69,71 @@ int main(int  argc, char ** argv){
 		return 1;
 	}
 
+	/*
 	printf("iflag = %d, hflag = %d, cflag = %d, nflag = %d, mflag = %d, sflag = %d dflag = %d\n", iflag, hflag, cflag, nflag, mflag, sflag, dflag);
 	printf("Archivo de entrada: %s\nNumero de hebras a crear: %d\nCantidad de palabras a ingresar: %d\nNumero de filas en matriz (N): %d\nNumero de columnas en matriz (M): %d\nArchivo de salida: %s\nImprime por pantalla: %s\n", 
 		input_file,
-		thread_number,
+		threads_number,
 		words_number,
 		matrix_col,
 		matrix_row,
 		output_file,
 		dflag ? "Si":"No"
 		);
-
+	*/
 	/*
 		Procesamiento
 	*/
+	
+
+
+	FILE* in_file = fopen(input_file, "r");
+	if(in_file == NULL) {
+		printf("El archivo %s no existe, ejecute el programa con un archivo existente\n", input_file);
+		return 1;
+	}
+
+	//Comprobando que la cantidad de palabras en el archivo concuerde con la cantidad de palabras que el usuario desea en la sopa
+	if( count_input_words(in_file) < words_number ){
+		printf("La cantidad de palabras a ingresar es mayor a la cantidad de palabras contenidas en el archivo\n");
+		return 1;
+	}
+
 	//Reserva de memoria para matrix
 	char ** matrix = allocate_matrix_memory(&matrix_row, &matrix_col);
 	//Rellenado de matriz con caracteres especiales @
 	matrix = initialize_matrix(matrix, &matrix_row, &matrix_col);
+
+	//Determina la cantidad de palabras que ingresará cada hebra
+	int words_per_thread = (int)ceil((float) words_number / threads_number);
+
+	if(threads_number > words_number){
+		threads_number = words_number;
+	}
+
+	//Arreglo de estrucuras de hebras
+	WSThread * threads = malloc(threads_number*sizeof(WSThread));
+	int i = 0;
+	while(i<threads_number){
+		pthread_create( &(threads[i].thread), NULL, locate, (void *) &(threads[i]));
+		i++;
+	}
+
+	//Reunir hebras
+	i = 0;
+	while(i<threads_number){
+		pthread_join( threads[i].thread, NULL);
+		i++;
+	}
+
 
 	if(dflag == 1){
 		//Mostrar matriz
 		show_matrix(matrix, &matrix_row, &matrix_col);
 	}
 
+
+	free(input_file);
 	/*
 	// Comprobar que el largo de la cadena a buscar es menor o igual al largo
 	// de cada linea
@@ -101,11 +142,6 @@ int main(int  argc, char ** argv){
 		return 1;
 	}
 		Procesamiento
-	FILE* archivo = fopen(input_file, "r");
-	if(archivo == NULL) {
-		printf("El archivo %s no existe, ejecute el programa con un archivo existente\n", input_file);
-		return 1;
-	}
 	int caracteres_reales_en_linea = calcularCaracteresRealesEnLinea(archivo);
 	if (caracteres_reales_en_linea != cantidad_caracteres_en_linea){
 		printf("La cantidad de caracteres por línea a leer es distinta número real de caracteres que contiene el archivo de entrada \"%s\"\n",input_file);
@@ -182,7 +218,6 @@ int main(int  argc, char ** argv){
 	free(nombre_archivo_completo);
 	
 	free(procesos_hijos);
-	free(input_file);
 	free(cadena_a_buscar);
 	*/
 	return 0;

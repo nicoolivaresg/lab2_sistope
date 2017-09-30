@@ -36,3 +36,6 @@ void show_matrix(char ** matrix, int * N, int * M){
 	}
 }
 
+
+
+

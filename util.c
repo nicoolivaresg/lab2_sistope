@@ -25,3 +25,20 @@ char* intToString(int number)
 	return str;
 }
 
+int count_input_words(FILE * file){
+	long int lines = 0;
+	char letter = 0;
+	fseek(file, 0, SEEK_SET);
+	while(fscanf(file, "%c", &letter) == 1) {
+		if(letter == '\n') {
+			lines++;
+		}
+	}
+	fseek(file, 0, SEEK_SET);
+	return (int) lines;
+}
+
+
+
+
+

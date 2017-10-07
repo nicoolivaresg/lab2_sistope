@@ -32,15 +32,26 @@ int digits(int number);
 char* intToString(int number);
 
 /**
- *Funcion que obtiene la cantidad de palabras que tienen un archivo
+ * Funcion que obtiene la cantidad de palabras que tienen un archivo
  *
- *Entrada:
+ * Entrada:
  *  file - puntero al archivo del cual se quiere contar las palabras.
  *
  *
  *
- *Salida: Cantidad de palabras que tiene el archivo
+ * Salida: Cantidad de palabras que tiene el archivo
  */
 int count_input_words(FILE * file);
+
+/**
+ * 
+ * 
+ * 
+ * 
+ */
+char* next_word(FILE* file);
+
+
+int get_locatable_coordinates(int rows, int cols, int* x, int* y);
 
 #endif

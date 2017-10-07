@@ -11,14 +11,23 @@
 struct WordSearchThread;
 
 typedef struct WordSearchThread{
-	pthread_t thread;
-	pthread_mutex_t thread_mutex;
 	int id;
-	int posX;
-	int posY;
-	int words_count;
+	int rows, cols;
+	int* posX;
+	int* posY;
+	int wordCount;
 	char ** words;
-}WSThread;
+	pthread_t thread;
+	pthread_mutex_t** threadMutex;
+} WSThread;
+
+void WSThread_init(WSThread* wsthread, int id, int rows, int cols, int words, pthread_mutex_t* mutex);
+
+void WSThread_add_word(WSThread* wsthread, char* word, int wordIndex);
+
+void WSThread_set_coordinates(WSThread* wsthread, int x, int y, int word);
+
+void WSThread_free(WSThread* wsthread);
 
 void * locate(void * args);
 

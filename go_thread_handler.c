@@ -1,16 +1,17 @@
 #include "thread_handler.h"
 #include "word_search_creator.h"
 #include <math.h>
+#include <assert.h>
 
 
 int main(int  argc, char ** argv){
-	int iflag = 0;//Flag nombre de archivo de entrada
-	int hflag = 0;//Flag numero de hebras
-	int cflag = 0;//Flag cantidad de palabras a ingresar
-	int nflag = 0;//Flag ancho matriz
-	int mflag = 0;//Flag largo matriz
-	int sflag = 0;//Flag nombre de archivo de salida
-	int dflag = 0;//Flag mostrar resultados por pantalla
+	int iflag = 0; //Flag nombre de archivo de entrada
+	int hflag = 0; //Flag numero de hebras
+	int cflag = 0; //Flag cantidad de palabras a ingresar
+	int nflag = 0; //Flag ancho matriz
+	int mflag = 0; //Flag largo matriz
+	int sflag = 0; //Flag nombre de archivo de salida
+	int dflag = 0; //Flag mostrar resultados por pantalla
 	char * input_file = NULL;
 	int threads_number = 0;
 	int matrix_row = 0;
@@ -86,40 +87,64 @@ int main(int  argc, char ** argv){
 	*/
 	
 
-
+	int i, j;
 	FILE* in_file = fopen(input_file, "r");
 	if(in_file == NULL) {
 		printf("El archivo %s no existe, ejecute el programa con un archivo existente\n", input_file);
 		return 1;
 	}
 
-	//Comprobando que la cantidad de palabras en el archivo concuerde con la cantidad de palabras que el usuario desea en la sopa
+	// Comprobando que la cantidad de palabras en el archivo concuerde con la cantidad de palabras que el usuario desea en la sopa
 	if( count_input_words(in_file) < words_number ){
 		printf("La cantidad de palabras a ingresar es mayor a la cantidad de palabras contenidas en el archivo\n");
 		return 1;
 	}
 
-	//Reserva de memoria para matrix
+	// Reserva de memoria para matrix
 	char ** matrix = allocate_matrix_memory(&matrix_row, &matrix_col);
-	//Rellenado de matriz con caracteres especiales @
+	// Rellenado de matriz con caracteres especiales @
 	matrix = initialize_matrix(matrix, &matrix_row, &matrix_col);
 
-	//Determina la cantidad de palabras que ingresará cada hebra
+
+	// Se usa para tratar casos bordes en donde una hebra intenta usar mas palabras de las que quedan
+	int words_left = words_number;
+	// Determina la cantidad de palabras que ingresará cada hebra
 	int words_per_thread = (int)ceil((float) words_number / threads_number);
 
 	if(threads_number > words_number){
 		threads_number = words_number;
 	}
 
-	//Arreglo de estrucuras de hebras
-	WSThread * threads = malloc(threads_number*sizeof(WSThread));
-	int i = 0;
-	while(i<threads_number){
-		pthread_create( &(threads[i].thread), NULL, locate, (void *) &(threads[i]));
-		i++;
+	// Crear mutexes de acuerdo a la cantidad de filas en el archivo
+	pthread_mutex_t* mutexes = malloc(matrix_row * sizeof(*mutexes));
+	for (i = 0; i < matrix_row; ++i)
+	{
+		pthread_mutex_init(&(mutexes[i]), NULL);
 	}
 
-	//Reunir hebras
+	// Arreglo de estrucuras de hebras
+	WSThread * threads = malloc(threads_number*sizeof(WSThread));
+	i = 0;
+	while(i < threads_number){
+		// Tener en cuenta que la division aproximada puede causar problemas.
+		// Por lo que se revisa que no se intente sacar mas palabras de las que hay.
+		if(words_left - words_per_thread < 0) {
+			words_per_thread = words_left;
+		}
+
+		WSThread_init(&(threads[i]), i+1, matrix_row, matrix_col, words_per_thread, mutexes);
+		for (j = 0; j < words_per_thread; ++j)
+		{
+			WSThread_add_word(&(threads[i]), next_word(in_file), j);
+		}
+
+		pthread_create( &(threads[i].thread), NULL, locate, (void *) &(threads[i]));
+		words_left -= words_per_thread;
+		i++;
+	}
+	assert(words_left == 0);
+
+	// Reunir hebras
 	i = 0;
 	while(i<threads_number){
 		pthread_join( threads[i].thread, NULL);
@@ -128,12 +153,15 @@ int main(int  argc, char ** argv){
 
 
 	if(dflag == 1){
-		//Mostrar matriz
+		// Mostrar matriz
 		show_matrix(matrix, &matrix_row, &matrix_col);
 	}
 
 
 	free(input_file);
+	free(threads);
+	free(matrix);
+
 	/*
 	// Comprobar que el largo de la cadena a buscar es menor o igual al largo
 	// de cada linea

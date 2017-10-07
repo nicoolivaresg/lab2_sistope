@@ -26,19 +26,40 @@ char* intToString(int number)
 }
 
 int count_input_words(FILE * file){
-	long int lines = 0;
+	long int lines = 0, letters = 0;
 	char letter = 0;
 	fseek(file, 0, SEEK_SET);
 	while(fscanf(file, "%c", &letter) == 1) {
 		if(letter == '\n') {
 			lines++;
+			letters = 0;
+		} else {
+			letters++;
 		}
 	}
+	if(letters > 0) lines++;
 	fseek(file, 0, SEEK_SET);
 	return (int) lines;
 }
 
 
+char* next_word(FILE* file) 
+{
+	char buffer[256];
+	fscanf(file, "%255[^\n]%*c", buffer);
 
+	int len = strlen(buffer);
+	char* word = malloc((len+1) * sizeof(*word));
+	strcpy(word, buffer);
 
+	return word;
+}
 
+int get_locatable_coordinates(int rows, int cols, int* x, int* y)
+{
+	int tempX, tempY;
+	*x = rand()%(cols);
+	*y = rand()%(rows);
+
+	return 0;
+}

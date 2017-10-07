@@ -14,4 +14,17 @@ char ** initialize_matrix(char ** matrix, int * N, int * M);
 
 void show_matrix(char ** matrix, int * N, int * M);
 
+void write_word_matrix(char*** matrix, int x, int y, char* word);
+
+void init_positionable(int rows, int cols);
+
+void set_positions(int x, int y, int wordLength);
+
+int get_locatable_coordinates(int rows, int cols, int* x, int* y, int wordLength);
+
+int can_position_in_matrix(int rows, int cols, int x, int y, int wordLength);
+
+// Variable global que almacena si es que se puede posicionar una palabra en este lugar
+extern int** positionable;
+
 #endif

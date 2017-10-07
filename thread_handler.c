@@ -61,8 +61,9 @@ void * locate(void * args) {
 	for (i = 0; i < t->wordCount; ++i)
 	{
 		char* word = t->words[i];
+		int lenWord = (int)strlen(word);
 		do {
-			int rc = get_locatable_coordinates(t->rows, t->cols, &(t->posX[i]), &(t->posY[i]));
+			int rc = get_locatable_coordinates(t->rows, t->cols, &(t->posX[i]), &(t->posY[i]), lenWord);
 			printf("%d %d %d\n", t->id, t->posX[i], t->posY[i]);
 			// Revisar si es que es posible poner esta palabra en algun lugar para que
 			// no se produzca un ciclo infinito.
@@ -70,18 +71,11 @@ void * locate(void * args) {
 
 		printf("seccion critica: %d\n", t->id);
 		int k;
-		for (int k = 0; k < 100; ++k);
+		for (int k = 0; k < 100000000; ++k);
+		set_positions(t->posX[i], t->posY[i], lenWord);
 
 		pthread_mutex_unlock(t->threadMutex[t->posY[i]]);
 	}
-	/*
-	int i = 0;
-	char * word = NULL;
-	while ( i <  t -> wordCount){
-		word = t -> words[i];
-		printf("%s\n", word);
-		i++;
-	}
-	*/
+
 	printf("Ubicando\n");
 }

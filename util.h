@@ -52,6 +52,8 @@ int count_input_words(FILE * file);
 char* next_word(FILE* file);
 
 
-int get_locatable_coordinates(int rows, int cols, int* x, int* y);
+// Definir valores 'booleanos'
+#define FALSE 0
+#define TRUE 1
 
 #endif

@@ -6,6 +6,7 @@
 #define _THREAD_HANDLER_H
 
 #include "util.h"
+#include "word_search_creator.h"
 #include <pthread.h>
 
 struct WordSearchThread;

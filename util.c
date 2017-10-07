@@ -55,11 +55,3 @@ char* next_word(FILE* file)
 	return word;
 }
 
-int get_locatable_coordinates(int rows, int cols, int* x, int* y)
-{
-	int tempX, tempY;
-	*x = rand()%(cols);
-	*y = rand()%(rows);
-
-	return 0;
-}

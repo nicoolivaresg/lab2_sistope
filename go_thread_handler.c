@@ -14,8 +14,8 @@ int main(int  argc, char ** argv){
 	int dflag = 0; //Flag mostrar resultados por pantalla
 	char * input_file = NULL;
 	int threads_number = 0;
-	int matrix_row = 0;
-	int matrix_col = 0;
+	int matrix_row = 0; // N
+	int matrix_col = 0; // M
 	int words_number = 0;
 	char * output_file = NULL;
 	int c;
@@ -42,11 +42,11 @@ int main(int  argc, char ** argv){
 				break;
 			case 'n':
 				nflag = 1;
-				sscanf(optarg, "%d", &matrix_col);
+				sscanf(optarg, "%d", &matrix_row);
 				break;
 			case 'm':
 				mflag = 1;
-				sscanf(optarg, "%d", &matrix_row);
+				sscanf(optarg, "%d", &matrix_col);
 				break;
 			case 'd':
 				dflag = 1;
@@ -105,6 +105,9 @@ int main(int  argc, char ** argv){
 	// Rellenado de matriz con caracteres especiales @
 	matrix = initialize_matrix(matrix, &matrix_row, &matrix_col);
 
+	// Inicializar matriz de posiciones
+	init_positionable(matrix_row, matrix_col);
+
 
 	// Se usa para tratar casos bordes en donde una hebra intenta usar mas palabras de las que quedan
 	int words_left = words_number;
@@ -150,6 +153,25 @@ int main(int  argc, char ** argv){
 		pthread_join( threads[i].thread, NULL);
 		i++;
 	}
+
+	// Rellenar la matriz con caracteres aleatorios
+	for (i = 0; i < matrix_row; i++)
+	{
+		for (j = 0; j < matrix_col; j++){
+			printf("%d", positionable[i][j]);
+		}
+		printf("\n");
+	}
+
+
+	// Escribir las palabras posicionadas por las hebras en la matriz
+	/*
+	for (i = 0; i < threads_number; ++i)
+	{
+		for(j = 0; j < threads[i].wordCount; j++) {
+			write_word_matrix(&matrix, threads[i].posX[j], threads[i].posY[j], threads[i].words[j]);
+		}
+	}*/
 
 
 	if(dflag == 1){

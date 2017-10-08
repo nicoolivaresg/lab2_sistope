@@ -37,21 +37,25 @@ char* intToString(int number);
  * Entrada:
  *  file - puntero al archivo del cual se quiere contar las palabras.
  *
- *
- *
  * Salida: Cantidad de palabras que tiene el archivo
  */
 int count_input_words(FILE * file);
 
 /**
+ * Funcion que obtiene la siguiente palabra (linea) en un archivo de palabras.
  * 
+ * Entrada:
+ *	file	- Puntero al archivo del cual se obtiene la siguiente palabra. 
  * 
- * 
- * 
+ * Salida: String con la palabra obtenida.
  */
 char* next_word(FILE* file);
 
-
+/**
+ * Funcion que retorna una letra mayuscula al azar.
+ * 
+ * Salida: Letra en el rango 'A' - 'Z' .
+ */
 char get_random_char();
 
 // Definir valores 'booleanos'

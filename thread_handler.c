@@ -52,13 +52,20 @@ void WSThread_set_coordinates(WSThread* wsthread, int x, int y, int word)
 
 void WSThread_free(WSThread* wsthread)
 {
+	int i, j;
 	free(wsthread->posX);
 	free(wsthread->posY);
-	for (int i = 0; i < wsthread->wordCount; ++i)
+	for (i = 0; i < wsthread->wordCount; ++i)
 	{
 		free(wsthread->words[i]);
 	}
 	free(wsthread->words);
+
+	free(wsthread->threadMutex);
+	for (int i = 0; i < wsthread->rows; ++i){
+		free(wsthread->matrix[i]);
+	}
+	free(wsthread->matrix);
 }
 
 void * locate(void * args) {

@@ -164,8 +164,30 @@ int main(int  argc, char ** argv){
 		show_matrix(matrix, &matrix_row, &matrix_col);
 	}
 
+	// Escribir el output en el archivo de salida
+	FILE* out_file = fopen(output_file, "w");
+	if(out_file == NULL) {
+		printf("No se pudo crear el archivo %s, revise sus permisos e intente otra vez.\n", output_file);
+		return 1;
+	}
 
+	for (int i = 0; i < matrix_row; ++i)
+	{
+		for (int j = 0; j < matrix_col; ++j)
+		{
+			fprintf(out_file, "%c", matrix[i][j]);
+		}
+		fprintf(out_file, "\n");
+	}
+
+	fclose(in_file);
+	fclose(out_file);
+	free(mutexes);
 	free(input_file);
+	free(output_file);
+	for (i = 0; i < threads_number; ++i){
+		WSThread_free(&(threads[i]));
+	}
 	free(threads);
 	free(matrix);
 

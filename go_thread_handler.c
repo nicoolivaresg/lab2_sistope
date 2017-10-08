@@ -135,7 +135,7 @@ int main(int  argc, char ** argv){
 			words_per_thread = words_left;
 		}
 
-		WSThread_init(&(threads[i]), i+1, matrix_row, matrix_col, words_per_thread, mutexes);
+		WSThread_init(&(threads[i]), i+1, matrix_row, matrix_col, words_per_thread, mutexes, matrix);
 		for (j = 0; j < words_per_thread; ++j)
 		{
 			WSThread_add_word(&(threads[i]), next_word(in_file), j);
@@ -154,24 +154,9 @@ int main(int  argc, char ** argv){
 		i++;
 	}
 
-	// Rellenar la matriz con caracteres aleatorios
-	for (i = 0; i < matrix_row; i++)
-	{
-		for (j = 0; j < matrix_col; j++){
-			printf("%d", positionable[i][j]);
-		}
-		printf("\n");
-	}
-
-
-	// Escribir las palabras posicionadas por las hebras en la matriz
-	/*
-	for (i = 0; i < threads_number; ++i)
-	{
-		for(j = 0; j < threads[i].wordCount; j++) {
-			write_word_matrix(&matrix, threads[i].posX[j], threads[i].posY[j], threads[i].words[j]);
-		}
-	}*/
+	char*** matrixPointer = threads[0].matrix;
+	// Rellenar la matriz con caracteres aleatorios donde tenga el caracter especial @
+	fill_matrix(matrixPointer, matrix_row, matrix_col);
 
 
 	if(dflag == 1){

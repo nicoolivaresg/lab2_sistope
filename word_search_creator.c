@@ -4,6 +4,7 @@
 */
 
 int** positionable = NULL;
+int longestEmpty;
 
 char ** allocate_matrix_memory(int * N, int * M){
 	char ** newMatrix = malloc(	(*N) * sizeof(char*) );
@@ -46,6 +47,17 @@ void write_word_matrix(char*** matrix, int x, int y, char* word) {
 	}
 }
 
+void fill_matrix(char*** matrix, int rows, int cols) {
+	int i, j;
+	for(i = 0; i < rows; i++) {
+		for(j = 0; j < cols; j++) {
+			if( *(matrix[i][j]) == '@') {
+				*(matrix[i][j]) = get_random_char();
+			}
+		}
+	}
+}
+
 void init_positionable(int rows, int cols) 
 {
 	positionable = malloc(rows * sizeof(*positionable));
@@ -61,14 +73,30 @@ void init_positionable(int rows, int cols)
 			positionable[i][j] = TRUE;
 		}
 	}
+
+	longestEmpty = cols;
 }
 
-void set_positions(int x, int y, int wordLength)
+void set_positions(int rows, int cols, int x, int y, int wordLength)
 {
-	int i;
+	int i, j;
 	for (i = 0; i < wordLength; ++i)
 	{
 		positionable[y][x + i] = FALSE;
+	}
+
+	longestEmpty = 0;
+	for(i = 0; i < rows; i++) {
+		int lEmpty = 0;
+		for(j = 0; j < cols; j++) {
+			if(positionable[i][j] == TRUE) {
+				lEmpty++;
+			} else {
+				longestEmpty = (lEmpty > longestEmpty) ? lEmpty : longestEmpty;
+				lEmpty = 0;
+			}
+		}
+		longestEmpty = (lEmpty > longestEmpty) ? lEmpty : longestEmpty;
 	}
 }
 
@@ -79,6 +107,9 @@ int get_locatable_coordinates(int rows, int cols, int* x, int* y, int wordLength
 	do {
 		tempX = rand()%(cols);
 		tempY = rand()%(rows);
+		if(longestEmpty < wordLength) {
+			return 1;
+		}
 	} while(can_position_in_matrix(rows, cols, tempX, tempY, wordLength) == FALSE);
 
 	*x = tempX;
@@ -88,7 +119,7 @@ int get_locatable_coordinates(int rows, int cols, int* x, int* y, int wordLength
 
 int can_position_in_matrix(int rows, int cols, int x, int y, int wordLength)
 {
-	if(x + wordLength >= cols) {
+	if(x + wordLength > cols) {
 		return FALSE;
 	} else {
 		int i;

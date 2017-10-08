@@ -18,11 +18,12 @@ typedef struct WordSearchThread{
 	int* posY;
 	int wordCount;
 	char ** words;
+	char *** matrix;
 	pthread_t thread;
-	pthread_mutex_t** threadMutex;
+	pthread_mutex_t ** threadMutex;
 } WSThread;
 
-void WSThread_init(WSThread* wsthread, int id, int rows, int cols, int words, pthread_mutex_t* mutex);
+void WSThread_init(WSThread* wsthread, int id, int rows, int cols, int words, pthread_mutex_t* mutex, char** matrix);
 
 void WSThread_add_word(WSThread* wsthread, char* word, int wordIndex);
 

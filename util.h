@@ -52,6 +52,8 @@ int count_input_words(FILE * file);
 char* next_word(FILE* file);
 
 
+char get_random_char();
+
 // Definir valores 'booleanos'
 #define FALSE 0
 #define TRUE 1

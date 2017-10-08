@@ -180,6 +180,12 @@ int main(int  argc, char ** argv){
 		fprintf(out_file, "\n");
 	}
 
+	// Liberar memoria utilizada
+	for (i = 0; i < matrix_row; ++i){
+		free(matrix[i]);
+	}
+	free(matrix);
+
 	fclose(in_file);
 	fclose(out_file);
 	free(mutexes);

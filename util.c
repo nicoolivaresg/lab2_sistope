@@ -56,6 +56,6 @@ char* next_word(FILE* file)
 }
 
 char get_random_char() {
-	return (char)(rand()%((int)'Z' - (int)'A' + 1) + (int)'A');
+	return (char)(rand()%((int)'z' - (int)'a' + 1) + (int)'a');
 }
 

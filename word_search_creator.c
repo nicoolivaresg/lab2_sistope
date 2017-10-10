@@ -43,7 +43,7 @@ void write_word_matrix(char*** matrix, int x, int y, char* word) {
 	int i, wordLength = strlen(word);
 	for (int i = 0; i < wordLength; ++i)
 	{
-		*(matrix[y][x+i]) = word[i];
+		*(matrix[y][x+i]) = toupper(word[i]);
 	}
 }
 

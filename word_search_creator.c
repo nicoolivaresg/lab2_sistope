@@ -33,7 +33,7 @@ void show_matrix(char ** matrix, int * N, int * M){
 	for (i = 0; i < (*N); i++)
 	{
 		for (j = 0; j < (*M); j++){
-			printf("%c", matrix[i][j]);
+			printf("%c ", matrix[i][j]);
 		}
 		printf("\n");
 	}

@@ -9,7 +9,7 @@ int loadWordsOnThreads(FILE *file, WSThread * threads , int threads_count, int w
 }
 */
 
-void WSThread_init(WSThread* wsthread, int id, int rows, int cols, int words, pthread_mutex_t* mutex, char** matrix)
+void WSThread_init(WSThread* wsthread, int id, int rows, int cols, int words, pthread_mutex_t* mutex, char** matrix, int dflag)
 {
 	int i, j;
 
@@ -37,6 +37,8 @@ void WSThread_init(WSThread* wsthread, int id, int rows, int cols, int words, pt
 	wsthread->posX = malloc(words * sizeof(*(wsthread->posX)));
 	wsthread->posY = malloc(words * sizeof(*(wsthread->posY)));
 	wsthread->words = malloc(words * sizeof(*(wsthread->words)));
+
+	wsthread->dflag = dflag;
 }
 
 void WSThread_add_word(WSThread* wsthread, char* word, int wordIndex)
@@ -79,25 +81,30 @@ void * locate(void * args) {
 	{
 		char* word = t->words[i];
 		int lenWord = (int)strlen(word);
+		// Este ciclo revisa si es que una palabra puede insertarse sin que sobreescriba una palabra
+		// que ya se encuntre posicionada, en caso de que la fila se encuntre ocupada por otro hilo,
+		// no se debe utilizar la posicion obtenida para evitar condiciones de carrera (el caso en que
+		// se seleccione una posicion y que la palabra que entro anteriormente a la fila aun no haya
+		// terminado de anotar las posiciones que ocupa, lo que causaria que erroneamente la otra
+		// hebra piense que puede escribirse y termine sobreescribiendo a la hebra que entro antes).
 		do {
 			int rc = get_locatable_coordinates(t->rows, t->cols, &(t->posX[i]), &(t->posY[i]), lenWord);
 			if(rc == 1) {
-				printf("Error, cant place all words on matrix, please try with a bigger matrix\n");
+				printf("Error: no es posible posicionar todas las palabras en la matriz, por favor intente denuevo con una matriz mas grande\n");
 				exit(0);
 			}
 			//printf("%d %d %d\n", t->id, t->posX[i], t->posY[i]);
 			// Revisar si es que es posible poner esta palabra en algun lugar para que
 			// no se produzca un ciclo infinito.
 		} while(pthread_mutex_trylock(t->threadMutex[t->posY[i]]) != 0);
+		if(t->dflag)
+			printf("enterSC(): hilo-%d con la palabra: '%s' en la posicion (%d, %d) \n", t->id, word, t->posX[i], t->posY[i]);
 
-		//printf("seccion critica: %d\n", t->id);
-		//int k;
-		//for (int k = 0; k < 10000000; ++k);
 		set_positions(t->rows, t->cols, t->posX[i], t->posY[i], lenWord);
 		write_word_matrix(t->matrix, t->posX[i], t->posY[i], word);
-
+		
+		if(t->dflag)
+			printf("exitSC(): hilo-%d inserto '%s' en la posicion (%d, %d)\n", t->id, word, t->posX[i], t->posY[i]);
 		pthread_mutex_unlock(t->threadMutex[t->posY[i]]);
 	}
-
-	//printf("Ubicando\n");
 }

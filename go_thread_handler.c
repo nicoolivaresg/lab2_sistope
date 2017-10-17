@@ -111,6 +111,7 @@ int main(int  argc, char ** argv){
 
 	// Se usa para tratar casos bordes en donde una hebra intenta usar mas palabras de las que quedan
 	int words_left = words_number;
+	int threads_left = threads_number;
 	// Determina la cantidad de palabras que ingresará cada hebra
 	int words_per_thread = (int)ceil((float) words_number / threads_number);
 
@@ -131,11 +132,12 @@ int main(int  argc, char ** argv){
 	while(i < threads_number){
 		// Tener en cuenta que la division aproximada puede causar problemas.
 		// Por lo que se revisa que no se intente sacar mas palabras de las que hay.
+		words_per_thread = (int)ceil((float) words_left / threads_left);
 		if(words_left - words_per_thread < 0) {
 			words_per_thread = words_left;
 		}
 
-		WSThread_init(&(threads[i]), i+1, matrix_row, matrix_col, words_per_thread, mutexes, matrix);
+		WSThread_init(&(threads[i]), i+1, matrix_row, matrix_col, words_per_thread, mutexes, matrix, dflag);
 		for (j = 0; j < words_per_thread; ++j)
 		{
 			WSThread_add_word(&(threads[i]), next_word(in_file), j);
@@ -143,6 +145,7 @@ int main(int  argc, char ** argv){
 
 		pthread_create( &(threads[i].thread), NULL, locate, (void *) &(threads[i]));
 		words_left -= words_per_thread;
+		threads_left--;
 		i++;
 	}
 	assert(words_left == 0);

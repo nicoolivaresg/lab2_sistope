@@ -12,6 +12,7 @@
 struct WordSearchThread;
 
 typedef struct WordSearchThread{
+	int dflag;		/* Si es que se debe mostrar output. */
 	int id;			/* Identificador para la hebra que use esta estructura. */
 	int rows, cols;	/* Filas y columnas de la matriz de caracteres. */
 	int* posX;		/* Coordenadas en el eje Y para cada palabra. */
@@ -39,8 +40,9 @@ typedef struct WordSearchThread{
  *		dentro del arreglo mutex para que cada hebra tenga acceso a todos los mutex.
  *	matrix	- Matriz de caracteres, se crea un puntero a cada posicion de la matriz para que cada hebra
  *		pueda acceder y modificar la matriz original. De esta forma se pueden insertar las palabras.
+ *	dflag	- Indica si es que se debe mostrar output de como se van posicionando las palabras.
  */
-void WSThread_init(WSThread* wsthread, int id, int rows, int cols, int words, pthread_mutex_t* mutex, char** matrix);
+void WSThread_init(WSThread* wsthread, int id, int rows, int cols, int words, pthread_mutex_t* mutex, char** matrix, int dflag);
 
 /**
  * Inserta una palabra en WSThread.words en el indice indicado por el parametro
